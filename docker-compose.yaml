@@ -1,0 +1,50 @@
+version: "3"
+
+
+services: 
+  app:
+    build: .
+    entrypoint: .docker/entrypoint.sh
+    container_name: cursonestjs-app
+    ports:
+      - "5000:3000"
+    volumes:
+      - .:/home/node/app
+    
+    depends_on:
+      - db
+      
+  db:
+    build: .docker/postgres
+    container_name: cursonestjs-db
+    restart: always
+    tty: true
+    ports: 
+      - "5555:5555"
+    volumes:
+      - .docker/dbdata:/var/lib/postgresql/data
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=cursonestjs 
+
+  
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: cursonestjs-pgadmin
+    tty: true
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+
+
+
+
+
